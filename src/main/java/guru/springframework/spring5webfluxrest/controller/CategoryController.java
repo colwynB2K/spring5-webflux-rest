@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static guru.springframework.spring5webfluxrest.controller.CategoryController.URI;
+
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping(URI)
 public class CategoryController {
+
+    public static final String URI = "/api/v1/categories";
 
     private final CategoryRepository categoryRepository;
 
