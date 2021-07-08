@@ -38,4 +38,11 @@ public class CategoryController {
     public Mono<Void> create(@RequestBody Publisher<Category> categoryStream) {  // called categoryStream as it can be a stream of one or more objects: Publisher is part of Reactive Streams API. Mono and Flux are implementations of a Publisher, so this method will be able to take in both.
         return categoryRepository.saveAll(categoryStream).then();   // .then() makes sure to return a Mono<Void>
     }
+
+    @PutMapping("/{id}")
+    public Mono<Category> update(@PathVariable String id, @RequestBody Category category) {
+        category.setId(id);
+
+        return categoryRepository.save(category);
+    }
 }
