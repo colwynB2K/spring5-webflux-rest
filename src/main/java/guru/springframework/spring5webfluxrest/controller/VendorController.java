@@ -16,7 +16,7 @@ import static guru.springframework.spring5webfluxrest.controller.VendorControlle
 @RequestMapping(URI)
 public class VendorController {
 
-    public static final String URI = "/api/v1/categories";
+    public static final String URI = "/api/v1/vendors";
 
     private final VendorRepository vendorRepository;
 

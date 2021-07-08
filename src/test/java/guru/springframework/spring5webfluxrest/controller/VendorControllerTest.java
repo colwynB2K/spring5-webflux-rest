@@ -61,7 +61,7 @@ class VendorControllerTest {
                                             .build()));
 
         // when
-        webTestClient.get().uri(CategoryController.URI + "/1")
+        webTestClient.get().uri(VendorController.URI + "/1")
                 .exchange()
                 .expectStatus()
                 .isOk()
