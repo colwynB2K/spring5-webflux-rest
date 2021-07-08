@@ -9,10 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.reactivestreams.Publisher;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -60,6 +62,23 @@ class CategoryControllerTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(Category.class);
+
+        // then
+    }
+
+    @Test
+    void create() {
+        // given
+        Flux<Category> savedCategories = Flux.just(Category.builder().build());
+        Mono<Category> categoryToSave = Mono.just(Category.builder().name("Cat1").build());
+        when(mockCategoryRepository.saveAll(any(Publisher.class))).thenReturn(savedCategories);
+
+        // when
+        webTestClient.post().uri(CategoryController.URI)
+                .body(categoryToSave, Category.class)
+                .exchange()
+                .expectStatus()
+                .isCreated();
 
         // then
     }

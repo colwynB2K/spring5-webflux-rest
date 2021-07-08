@@ -3,10 +3,9 @@ package guru.springframework.spring5webfluxrest.controller;
 import guru.springframework.spring5webfluxrest.domain.Category;
 import guru.springframework.spring5webfluxrest.repository.CategoryRepository;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.reactivestreams.Publisher;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,5 +31,11 @@ public class CategoryController {
     @GetMapping("/{id}")
     public Mono<Category> findById(@PathVariable String id) {
         return categoryRepository.findById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)                                           // Make sure to return a 201 HTTP STATUS for object creations
+    public Mono<Void> create(@RequestBody Publisher<Category> categoryStream) {  // called categoryStream as it can be a stream of one or more objects: Publisher is part of Reactive Streams API. Mono and Flux are implementations of a Publisher, so this method will be able to take in both.
+        return categoryRepository.saveAll(categoryStream).then();   // .then() makes sure to return a Mono<Void>
     }
 }
