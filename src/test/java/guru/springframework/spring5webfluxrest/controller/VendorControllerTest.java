@@ -1,7 +1,8 @@
 package guru.springframework.spring5webfluxrest.controller;
 
-import guru.springframework.spring5webfluxrest.domain.Category;
-import guru.springframework.spring5webfluxrest.repository.CategoryRepository;
+
+import guru.springframework.spring5webfluxrest.domain.Vendor;
+import guru.springframework.spring5webfluxrest.repository.VendorRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,36 +15,37 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryControllerTest {
+class VendorControllerTest {
 
     private WebTestClient webTestClient;
 
     @Mock
-    private CategoryRepository mockCategoryRepository;
+    private VendorRepository mockVendorRepository;
 
     @InjectMocks
-    private CategoryController categoryController;
+    private VendorController vendorController;
 
     @BeforeEach
     void setUp() {
-        webTestClient = WebTestClient.bindToController(categoryController).build();
+        webTestClient = WebTestClient.bindToController(vendorController).build();
     }
 
     @Test
     void findAll() {
         // given
-        when(mockCategoryRepository.findAll()).thenReturn(Flux.just(Category.builder().name("Cat1").build(),
-                                                                    Category.builder().name("Cat2").build()));
+        given(mockVendorRepository.findAll())
+                .willReturn(Flux.just(Vendor.builder().firstName("Vendor").lastName("One").build(),
+                                        Vendor.builder().firstName("Vendor").lastName("Two").build()));
 
         // when
-        webTestClient.get().uri(CategoryController.URI)
+        webTestClient.get().uri(VendorController.URI)
                             .exchange()
                             .expectStatus()
                             .isOk()
-                            .expectBodyList(Category.class)
+                            .expectBodyList(Vendor.class)
                             .hasSize(2);
 
         // then
@@ -52,14 +54,18 @@ class CategoryControllerTest {
     @Test
     void findById() {
         // given
-        when(mockCategoryRepository.findById(anyString())).thenReturn(Mono.just(Category.builder().name("Cat1").build()));
+        given(mockVendorRepository.findById(anyString()))
+                .willReturn(Mono.just(Vendor.builder()
+                                            .firstName("Vendor")
+                                            .lastName("One")
+                                            .build()));
 
         // when
         webTestClient.get().uri(CategoryController.URI + "/1")
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(Category.class);
+                .expectBody(Vendor.class);
 
         // then
     }
