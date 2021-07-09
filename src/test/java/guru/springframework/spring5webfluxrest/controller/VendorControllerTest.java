@@ -1,6 +1,5 @@
 package guru.springframework.spring5webfluxrest.controller;
 
-
 import guru.springframework.spring5webfluxrest.domain.Vendor;
 import guru.springframework.spring5webfluxrest.repository.VendorRepository;
 
@@ -10,10 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.reactivestreams.Publisher;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
@@ -66,6 +67,39 @@ class VendorControllerTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(Vendor.class);
+
+        // then
+    }
+
+    @Test
+    void create() {
+        // given
+        Mono<Vendor> vendorToSaveMono = Mono.just(Vendor.builder().firstName("Vendor").lastName("One").build());
+        Flux<Vendor> savedVendors = Flux.just(Vendor.builder().build());
+        given(mockVendorRepository.saveAll(any(Publisher.class))).willReturn(savedVendors);
+
+        // when
+        webTestClient.post().uri(VendorController.URI)
+                .body(vendorToSaveMono, Vendor.class)
+                .exchange()
+                .expectStatus()
+                .isCreated();
+
+        // then
+    }
+
+    @Test
+    void update() {
+        //given
+        Mono<Vendor> vendorToSaveMono = Mono.just(Vendor.builder().firstName("Vendor").lastName("One").build());
+        given(mockVendorRepository.save(any(Vendor.class))).willReturn(Mono.just(Vendor.builder().build()));
+
+        // when
+        webTestClient.put().uri(VendorController.URI + "/1")
+                .body(vendorToSaveMono, Vendor.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         // then
     }
