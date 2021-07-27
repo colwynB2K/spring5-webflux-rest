@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryControllerTest {
@@ -97,5 +97,40 @@ class CategoryControllerTest {
                 .isOk();
 
         // then
+    }
+
+    @Test
+    void patchWithChanges() {
+        //given
+        when(mockCategoryRepository.findById(anyString())).thenReturn(Mono.just(Category.builder().build()));
+        when(mockCategoryRepository.save(any(Category.class))).thenReturn(Mono.just(Category.builder().build()));
+        Mono<Category> categoryToPatchMono = Mono.just(Category.builder().name("Cat1").build());
+
+        // when
+        webTestClient.patch().uri(CategoryController.URI + "/1")
+                .body(categoryToPatchMono, Category.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        // then
+        verify(mockCategoryRepository).save(any());
+    }
+
+    @Test
+    void patchWithoutChanges() {
+        //given
+        when(mockCategoryRepository.findById(anyString())).thenReturn(Mono.just(Category.builder().name("Cat1").build()));
+        Mono<Category> categoryToPatchMono = Mono.just(Category.builder().name("Cat1").build());
+
+        // when
+        webTestClient.patch().uri(CategoryController.URI + "/1")
+                .body(categoryToPatchMono, Category.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        // then
+        verify(mockCategoryRepository, never()).save(any());
     }
 }

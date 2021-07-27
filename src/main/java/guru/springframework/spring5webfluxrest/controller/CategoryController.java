@@ -1,10 +1,12 @@
 package guru.springframework.spring5webfluxrest.controller;
 
 import guru.springframework.spring5webfluxrest.domain.Category;
+import guru.springframework.spring5webfluxrest.exception.ResourceNotFoundException;
 import guru.springframework.spring5webfluxrest.repository.CategoryRepository;
 
 import org.reactivestreams.Publisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,5 +46,20 @@ public class CategoryController {
         category.setId(id);
 
         return categoryRepository.save(category);
+    }
+
+    @PatchMapping("/{id}")
+    public Mono<Category> patch(@PathVariable String id, @RequestBody Category category) {
+        Category categoryToPatch = categoryRepository.findById(id).block();
+        if (categoryToPatch == null) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (StringUtils.hasText(category.getName()) && !category.getName().equals(categoryToPatch.getName())) {
+            categoryToPatch.setName(category.getName());
+            categoryRepository.save(categoryToPatch);
+        }
+
+        return Mono.just(categoryToPatch);
     }
 }
